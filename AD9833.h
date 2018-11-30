@@ -30,6 +30,8 @@
 
 //#define FNC_PIN 4			// Define FNC_PIN for fast digital writes
 
+
+/* This part may be not suitable for STM
 #ifdef FNC_PIN
 	// Use digitalWriteFast for a speedup
 	#include "digitalWriteFast.h"
@@ -37,6 +39,8 @@
 #else  // otherwise, just use digitalWrite
 	#define WRITE_FNCPIN(Val) digitalWrite(FNCpin,(Val))
 #endif
+*/
+#define WRITE_FNCPIN(Val) digitalWrite(FNCpin,(Val))
 
 #define pow2_28				268435456L	// 2^28 used in frequency word calculation
 #define BITS_PER_DEG		11.3777777777778	// 4096 / 360
