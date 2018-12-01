@@ -342,9 +342,12 @@ void AD9833 :: WriteControlRegister ( void ) {
 
 void AD9833 :: WriteRegister ( int16_t dat ) {
 	/*
-	 * We set the mode here, because other hardware may be doing SPI also
+	 * We set the mode here, because `other hardware may be doing SPI also
 	 */
 	SPI.setDataMode(SPI_MODE2);
+	//SPI.setBitOrder(MSBFIRST); // Set the SPI_1 bit order
+	// Slow speed (72 / 128 = 562kHz SPI_1 speed)
+	SPI.setClockDivider(SPI_CLOCK_DIV128); 
 
 	/* Improve overall switching speed
 	 * Note, the times are for this function call, not the write.

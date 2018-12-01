@@ -33,8 +33,8 @@ Using the first SPI port (SPI_1)
     MOSI  <-->  PA7 <-->  BOARD_SPI1_MOSI_PIN
 
 LED Pin PB0
-FNC_PIN_1 PA1
-FNC_PIN_2 PA2
+FNC_PIN_1 PA1 (IC1)
+FNC_PIN_2 PA2 (IC2)
 */
 
 
@@ -45,7 +45,7 @@ FNC_PIN_2 PA2
 #define ON            F("ON")
 #define OFF           F("OFF")
 #define LED_PIN       PB0      // I'm alive blinker  
-#define FNC_PIN       PA1       // Any digital pin. Used to enable SPI transfers (active LO  
+#define FNC_PIN       PA2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // Any digital pin. Used to enable SPI transfers (active LO  
 
 
 //--------------- Create an AD9833 object ---------------- 
@@ -55,6 +55,7 @@ AD9833 gen(FNC_PIN);       // Defaults to 25MHz internal reference frequency
 
 void setup() { 
     pinMode(LED_PIN,OUTPUT);
+    digitalWrite(LED_PIN, HIGH);
 
     while (!Serial);          // Delay until terminal opens
     Serial.begin(9600);
@@ -62,10 +63,10 @@ void setup() {
     // This MUST be the first command after declaring the AD9833 object
     gen.Begin();              // The loaded defaults are 1000 Hz SINE_WAVE using REG0
                               // The output is OFF, Sleep mode is disabled
-    gen.SetFrequency(REG0,1000);
-    gen.EnableOutput(false);  // Turn ON the output
+    gen.ApplySignal(SINE_WAVE,REG0,1000);
+    gen.EnableOutput(true);  // Turn ON the output
 }
 
 void loop() { 
-
+delay(1);
 }
