@@ -45,13 +45,15 @@ FNC_PIN_2 PA2 (IC2)
 #define ON            F("ON")
 #define OFF           F("OFF")
 #define LED_PIN       PB0      // I'm alive blinker  
-#define FNC_PIN       PA2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // Any digital pin. Used to enable SPI transfers (active LO  
+#define FNC_PIN_1     PA1
+#define FNC_PIN_2     PA2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // Any digital pin. Used to enable SPI transfers (active LO  
 
 
 //--------------- Create an AD9833 object ---------------- 
 // Note, SCK and MOSI must be connected to CLK and DAT pins on the AD9833 for SPI
 // -----      AD9833 ( FNCpin, referenceFrequency = 25000000UL )
-AD9833 gen(FNC_PIN);       // Defaults to 25MHz internal reference frequency
+AD9833 gen_1(FNC_PIN_1);       // Defaults to 25MHz internal reference frequency
+AD9833 gen_2(FNC_PIN_2);
 
 void setup() { 
     pinMode(LED_PIN,OUTPUT);
@@ -61,10 +63,31 @@ void setup() {
     Serial.begin(9600);
 
     // This MUST be the first command after declaring the AD9833 object
-    gen.Begin();              // The loaded defaults are 1000 Hz SINE_WAVE using REG0
-                              // The output is OFF, Sleep mode is disabled
-    gen.ApplySignal(SINE_WAVE,REG0,1000);
-    gen.EnableOutput(true);  // Turn ON the output
+    SPI.begin();
+    delay(100);
+    digitalWrite(FNC_PIN_1, LOW);
+    digitalWrite(FNC_PIN_2, LOW);
+    gen_1.Reset();
+    gpio_write_bit(GPIOA, 1, HIGH);
+    gpio_write_bit(GPIOA, 2, HIGH);
+
+    //gen_1.ApplySignal(SINE_WAVE,REG0,1000);
+    gen_1.SetFrequency ( REG0, 22000 );
+    gen_1.SetPhase ( REG0, 0 );
+    //gen_1.SetOutputSource ( REG0, REG0 );
+    gen_2.SetFrequency ( REG0, 22000 );
+    gen_2.SetPhase ( REG0, 0 );
+    //gen_2.SetOutputSource ( REG0, REG0 );
+
+    //gen_2.ApplySignal(SINE_WAVE,REG0,1000);
+    digitalWrite(FNC_PIN_1, LOW);
+    digitalWrite(FNC_PIN_2, LOW);
+    gen_1.EnableOutput(true);  // Turn ON the output
+    //gen_2.EnableOutput(true);  // Turn ON the output
+    gpio_write_bit(GPIOA, 1, HIGH);
+    gpio_write_bit(GPIOA, 2, HIGH);
+
+    gen_1.SetPhase ( REG0, 90 );
 }
 
 void loop() { 

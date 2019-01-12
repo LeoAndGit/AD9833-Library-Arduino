@@ -40,6 +40,7 @@
 	#define WRITE_FNCPIN(Val) digitalWrite(FNCpin,(Val))
 #endif
 */
+
 #define WRITE_FNCPIN(Val) digitalWrite(FNCpin,(Val))
 
 #define pow2_28				268435456L	// 2^28 used in frequency word calculation
@@ -129,6 +130,9 @@ private:
 
 	void 			WriteRegister ( int16_t dat );
 	void 			WriteControlRegister ( void );
+	//Remove the CS Pin write
+	void 			WriteControlRegisterForReset ( void );
+	void 			WriteRegisterForReset ( int16_t dat );
 	uint16_t		waveForm0, waveForm1;
 #ifndef FNC_PIN
 	uint8_t			FNCpin;

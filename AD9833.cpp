@@ -126,7 +126,7 @@ D0	Reserved. Must be 0.
  * state.
  */
 void AD9833 :: Reset ( void ) {
-	WriteRegister(RESET_CMD);
+	WriteRegisterForReset(RESET_CMD);
 	delay(15);
 }
 
@@ -228,7 +228,7 @@ void AD9833 :: SetWaveform (  Registers waveFormReg, WaveformType waveType ) {
  */
 void AD9833 :: EnableOutput ( bool enable ) {
 	outputEnabled = enable;
-	WriteControlRegister();
+	WriteControlRegisterForReset();
 }
 
 /*
@@ -365,3 +365,71 @@ void AD9833 :: WriteRegister ( int16_t dat ) {
 	WRITE_FNCPIN(HIGH);		// Write done
 }
 
+
+void AD9833 :: WriteControlRegisterForReset ( void ) {
+	uint16_t waveForm;
+	// TODO: can speed things up by keeping a writeReg0 and writeReg1
+	// that presets all bits during the various setup function calls
+	// rather than setting flags. Then we could just call WriteRegister
+	// directly.
+	if ( activeFreq == REG0 ) {
+		waveForm = waveForm0;
+		waveForm &= ~FREQ1_OUTPUT_REG;
+	}
+	else {
+		waveForm = waveForm1;
+		waveForm |= FREQ1_OUTPUT_REG;
+	}
+	if ( activePhase == REG0 )
+		waveForm &= ~PHASE1_OUTPUT_REG;
+	else
+		waveForm |= PHASE1_OUTPUT_REG;
+	if ( outputEnabled )
+		waveForm &= ~RESET_CMD;
+	else
+		waveForm |= RESET_CMD;
+	if ( DacDisabled )
+		waveForm |= DISABLE_DAC;
+	else
+		waveForm &= ~DISABLE_DAC;
+	if ( IntClkDisabled )
+		waveForm |= DISABLE_INT_CLK;
+	else
+		waveForm &= ~DISABLE_INT_CLK;
+
+	/*
+	 * We set the mode here, because `other hardware may be doing SPI also
+	 */
+	SPI.setDataMode(SPI_MODE2);
+	//SPI.setBitOrder(MSBFIRST); // Set the SPI_1 bit order
+	// Slow speed (72 / 128 = 562kHz SPI_1 speed)
+	SPI.setClockDivider(SPI_CLOCK_DIV128); 
+
+	//Remove the CS Pin write
+	//WRITE_FNCPIN(LOW);		// FNCpin low to write to AD9833
+
+	// TODO: Are we running at the highest clock rate?
+	SPI.transfer(highByte(waveForm));	// Transmit 16 bits 8 bits at a time
+	SPI.transfer(lowByte(waveForm));
+
+	//WRITE_FNCPIN(HIGH);		// Write done
+}
+
+void AD9833 :: WriteRegisterForReset ( int16_t dat ) {
+/*
+	 * We set the mode here, because `other hardware may be doing SPI also
+	 */
+	SPI.setDataMode(SPI_MODE2);
+	//SPI.setBitOrder(MSBFIRST); // Set the SPI_1 bit order
+	// Slow speed (72 / 128 = 562kHz SPI_1 speed)
+	SPI.setClockDivider(SPI_CLOCK_DIV128); 
+
+	//Remove the CS Pin write
+	//WRITE_FNCPIN(LOW);		// FNCpin low to write to AD9833
+
+	// TODO: Are we running at the highest clock rate?
+	SPI.transfer(highByte(dat));	// Transmit 16 bits 8 bits at a time
+	SPI.transfer(lowByte(dat));
+
+	//WRITE_FNCPIN(HIGH);		// Write done
+}
