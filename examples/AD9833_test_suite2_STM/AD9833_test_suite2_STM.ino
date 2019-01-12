@@ -64,14 +64,16 @@ void setup() {
 
     // This MUST be the first command after declaring the AD9833 object
     SPI.begin();
-    delay(100);
-    digitalWrite(FNC_PIN_1, LOW);
-    digitalWrite(FNC_PIN_2, LOW);
+    delay(10);
+    gpio_write_bit(GPIOA, 1, LOW);
+    gpio_write_bit(GPIOA, 2, LOW);
     gen_1.Reset();
     gpio_write_bit(GPIOA, 1, HIGH);
     gpio_write_bit(GPIOA, 2, HIGH);
 
-    //gen_1.ApplySignal(SINE_WAVE,REG0,1000);
+    //I don't know why these two cannot work with SetPhase( REG0, xx )
+    //gen_1.ApplySignal(SINE_WAVE,REG0,22000);
+    //gen_2.ApplySignal(SINE_WAVE,REG0,22000);    
     gen_1.SetFrequency ( REG0, 22000 );
     gen_1.SetPhase ( REG0, 0 );
     //gen_1.SetOutputSource ( REG0, REG0 );
@@ -79,15 +81,13 @@ void setup() {
     gen_2.SetPhase ( REG0, 0 );
     //gen_2.SetOutputSource ( REG0, REG0 );
 
-    //gen_2.ApplySignal(SINE_WAVE,REG0,1000);
-    digitalWrite(FNC_PIN_1, LOW);
-    digitalWrite(FNC_PIN_2, LOW);
+    gpio_write_bit(GPIOA, 1, LOW);
+    gpio_write_bit(GPIOA, 2, LOW);
     gen_1.EnableOutput(true);  // Turn ON the output
-    //gen_2.EnableOutput(true);  // Turn ON the output
     gpio_write_bit(GPIOA, 1, HIGH);
     gpio_write_bit(GPIOA, 2, HIGH);
 
-    gen_1.SetPhase ( REG0, 90 );
+    gen_1.SetPhase ( REG0, 180 );
 }
 
 void loop() { 
