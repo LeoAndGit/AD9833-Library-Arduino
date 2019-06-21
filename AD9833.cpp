@@ -354,7 +354,12 @@ void AD9833 :: WriteRegister ( int16_t dat ) {
 	 * digitalWrite(FNCpin)			~ 17.6 usec
 	 * digitalWriteFast2(FNC_PIN)	~  8.8 usec
 	 */
-	WRITE_FNCPIN(LOW);		// FNCpin low to write to AD9833
+	#ifdef FNC_PIN_DISABLE
+		
+	#else
+		WRITE_FNCPIN(LOW);		// FNCpin low to write to AD9833
+	#endif
+	
 
 	//delayMicroseconds(2);	// Some delay may be needed
 
@@ -362,7 +367,11 @@ void AD9833 :: WriteRegister ( int16_t dat ) {
 	SPI.transfer(highByte(dat));	// Transmit 16 bits 8 bits at a time
 	SPI.transfer(lowByte(dat));
 
-	WRITE_FNCPIN(HIGH);		// Write done
+	#ifdef FNC_PIN_DISABLE
+		
+	#else
+		WRITE_FNCPIN(HIGH);		// Write done
+	#endif
 }
 
 
